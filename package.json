@@ -5,23 +5,27 @@
     "type": "commonjs",
     "main": "dist/server.js",
     "scripts": {
-        "dev": "tsx src/server.ts",
+        "dev": "wrangler dev src/index.ts",
         "build": "tsc -p tsconfig.json",
-        "start": "node dist/server.js"
+        "start": "node dist/server.js",
+        "deploy": "wrangler deploy"
     },
     "dependencies": {
         "axios": "^1.7.9",
         "dotenv": "^16.4.5",
         "express": "^4.19.2",
+        "hono": "^4.6.10",
         "mackflow-bridge": "file:",
         "pino": "^9.3.2",
         "pino-pretty": "^11.2.0",
         "zod": "^3.23.8"
     },
     "devDependencies": {
+        "@cloudflare/workers-types": "^4.20250201.0",
         "@types/express": "^4.17.21",
         "@types/node": "^20.14.12",
         "tsx": "^4.16.2",
-        "typescript": "^5.6.2"
+        "typescript": "^5.6.2",
+        "wrangler": "^4.61.1"
     }
 }

@@ -1,0 +1,8 @@
+CABME_BASE_URL=https://console.mackflow.com.br/api/v1/
+CABME_APIKEY=your_cabme_apikey
+CABME_ACCESSTOKEN=your_cabme_accesstoken
+ZPRO_BASE_URL=https://api.soucall.com.br
+ZPRO_API_ID=cf3aaa7b-236c-4267-be5a-5a62b0882264
+ZPRO_TOKEN=your_zpro_token
+REQUEST_TIMEOUT_MS=15000
+LOG_LEVEL=info

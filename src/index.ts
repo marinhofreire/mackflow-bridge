@@ -30,6 +30,7 @@ app.use("*", async (c, next) => {
 });
 
 app.get("/health", (c) => healthHandler(c));
+app.get("/", (c) => c.json({ ok: true, service: "mackflow-bridge" }));
 app.get("/admin/smoke", (c) => adminSmokeHandler(c));
 
 app.onError((err, c) => {

@@ -18,7 +18,9 @@ async function timedCall(fn: () => Promise<Response>): Promise<CallResult> {
     }
 }
 
-export async function adminSmokeHandler(c: Context<{ Bindings: WorkerEnv }>) {
+export async function adminSmokeHandler(
+    c: Context<{ Bindings: WorkerEnv; Variables: { requestId: string } }>
+) {
     const env = c.env;
     const [cabme, zpro] = await Promise.all([
         timedCall(() => getVehicleCategories(env)),

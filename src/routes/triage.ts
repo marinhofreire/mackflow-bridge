@@ -6,6 +6,8 @@ export const triageRouter = Router();
 type TriageBody = {
     sessionId?: string;
     message?: string;
+    number?: string;
+    externalKey?: string;
 };
 
 triageRouter.post("/triage", (req, res) => {
@@ -17,11 +19,13 @@ triageRouter.post("/triage", (req, res) => {
     }
 
     const sessionId =
-        typeof body.sessionId === "string" && body.sessionId.trim().length > 0
-            ? body.sessionId.trim()
-            : req.requestId;
+        typeof body.externalKey === "string" && body.externalKey.trim().length > 0
+            ? body.externalKey.trim()
+            : typeof body.sessionId === "string" && body.sessionId.trim().length > 0
+                ? body.sessionId.trim()
+                : req.requestId;
 
-    const result = handleTriageMessage(sessionId, body.message);
+    const result = handleTriageMessage(sessionId, body.message, { phone: body.number ?? null });
 
     res.json({
         sessionId,

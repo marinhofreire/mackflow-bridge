@@ -6,6 +6,13 @@
         "ZPRO_BASE_URL": "https://api.soucall.com.br",
         "ZPRO_API_ID": "cf3aaa7b-236c-4267-be5a-5a62b0882264"
     },
+    "kv_namespaces": [
+        {
+            "binding": "EVENT_DEDUP",
+            "id": "REPLACE_WITH_EVENT_DEDUP_ID",
+            "preview_id": "REPLACE_WITH_EVENT_DEDUP_PREVIEW_ID"
+        }
+    ],
     "routes": [
         {
             "pattern": "bridge.mackflow.com.br",

@@ -23,5 +23,12 @@ npm run deploy
 - POST /triage
 - POST /zpro/incoming
 
+## Observações (Cabme + deduplicação)
+- Para abrir OS no Cabme, configure CABME_CREATE_OS_PATH com o endpoint correto de criação (ex: v1/ride-book/).
+- Ajuste os defaults obrigatórios do Cabme (user_id e coordenadas) via variáveis CABME_DEFAULT_*. 
+- Configure o KV EVENT_DEDUP no Cloudflare e atualize os IDs em wrangler.jsonc (usado para deduplicação e sessão do triage).
+- POST /triage
+- POST /zpro/incoming
+
 ## Segurança
 - Para proteger /admin/smoke, configure ADMIN_KEY e envie o header x-admin-key.

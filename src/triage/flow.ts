@@ -1,4 +1,11 @@
-export type TriageStep = "ASK_NAME" | "ASK_PLATE" | "ASK_LOCATION" | "ASK_SERVICE" | "ASK_FINANCIAL" | "DONE";
+export type TriageStep =
+    | "ASK_NAME"
+    | "ASK_PLATE"
+    | "ASK_LOCATION"
+    | "ASK_SERVICE"
+    | "ASK_FINANCIAL"
+    | "READY_TO_OPEN_OS"
+    | "DONE";
 
 export type TriageSession = {
     step: TriageStep;
@@ -6,6 +13,8 @@ export type TriageSession = {
     plate?: string;
     location?: string;
     serviceType?: string;
+    phone?: string;
+    statusFinanceiro?: "ADIMPLENTE" | "INADIMPLENTE";
 };
 
 export type TriageResult = {
@@ -36,6 +45,14 @@ function getSession(sessionId: string): TriageSession {
     return fresh;
 }
 
+export function getSessionState(sessionId: string): TriageSession | undefined {
+    return sessions.get(sessionId);
+}
+
+export function setSessionState(sessionId: string, session: TriageSession): void {
+    sessions.set(sessionId, session);
+}
+
 function normalize(input: string) {
     return input.trim();
 }
@@ -53,15 +70,30 @@ function resolveServiceType(input: string) {
     return null;
 }
 
-export function handleTriageMessage(sessionId: string, message: string): TriageResult {
+export function handleTriageMessage(
+    sessionId: string,
+    message: string,
+    options?: { phone?: string | null }
+): TriageResult {
     const session = getSession(sessionId);
     const text = normalize(message);
+
+    if (options?.phone && !session.phone) {
+        session.phone = options.phone;
+    }
 
     if (emergencyRegex.test(text)) {
         return {
             reply: "Sinto muito! Se houver vítimas, ligue 190/193 agora. Posso ajudar com algo mais? 🚨",
             step: session.step,
-            data: { name: session.name, plate: session.plate, location: session.location, serviceType: session.serviceType }
+            data: {
+                name: session.name,
+                plate: session.plate,
+                location: session.location,
+                serviceType: session.serviceType,
+                phone: session.phone,
+                statusFinanceiro: session.statusFinanceiro
+            }
         };
     }
 
@@ -70,7 +102,14 @@ export function handleTriageMessage(sessionId: string, message: string): TriageR
             return {
                 reply: "Olá! Qual seu nome? 🙂",
                 step: session.step,
-                data: { name: session.name, plate: session.plate, location: session.location, serviceType: session.serviceType }
+                data: {
+                    name: session.name,
+                    plate: session.plate,
+                    location: session.location,
+                    serviceType: session.serviceType,
+                    phone: session.phone,
+                    statusFinanceiro: session.statusFinanceiro
+                }
             };
         }
         session.name = text;
@@ -78,7 +117,14 @@ export function handleTriageMessage(sessionId: string, message: string): TriageR
         return {
             reply: `Obrigado, ${session.name}! Qual a placa do veículo? 🚗`,
             step: session.step,
-            data: { name: session.name, plate: session.plate, location: session.location, serviceType: session.serviceType }
+            data: {
+                name: session.name,
+                plate: session.plate,
+                location: session.location,
+                serviceType: session.serviceType,
+                phone: session.phone,
+                statusFinanceiro: session.statusFinanceiro
+            }
         };
     }
 
@@ -87,7 +133,14 @@ export function handleTriageMessage(sessionId: string, message: string): TriageR
             return {
                 reply: "Qual a placa do veículo? 🚗",
                 step: session.step,
-                data: { name: session.name, plate: session.plate, location: session.location, serviceType: session.serviceType }
+                data: {
+                    name: session.name,
+                    plate: session.plate,
+                    location: session.location,
+                    serviceType: session.serviceType,
+                    phone: session.phone,
+                    statusFinanceiro: session.statusFinanceiro
+                }
             };
         }
         session.plate = text.toUpperCase();
@@ -95,7 +148,14 @@ export function handleTriageMessage(sessionId: string, message: string): TriageR
         return {
             reply: "Onde você está? (bairro e cidade ou envie localização) 📍",
             step: session.step,
-            data: { name: session.name, plate: session.plate, location: session.location, serviceType: session.serviceType }
+            data: {
+                name: session.name,
+                plate: session.plate,
+                location: session.location,
+                serviceType: session.serviceType,
+                phone: session.phone,
+                statusFinanceiro: session.statusFinanceiro
+            }
         };
     }
 
@@ -104,7 +164,14 @@ export function handleTriageMessage(sessionId: string, message: string): TriageR
             return {
                 reply: "Onde você está? (bairro e cidade ou envie localização) 📍",
                 step: session.step,
-                data: { name: session.name, plate: session.plate, location: session.location, serviceType: session.serviceType }
+                data: {
+                    name: session.name,
+                    plate: session.plate,
+                    location: session.location,
+                    serviceType: session.serviceType,
+                    phone: session.phone,
+                    statusFinanceiro: session.statusFinanceiro
+                }
             };
         }
         session.location = text;
@@ -112,7 +179,14 @@ export function handleTriageMessage(sessionId: string, message: string): TriageR
         return {
             reply: "Qual o tipo de serviço? (Guincho / Pane elétrica / Pneu / Chaveiro / Mecânico) 🔧",
             step: session.step,
-            data: { name: session.name, plate: session.plate, location: session.location, serviceType: session.serviceType }
+            data: {
+                name: session.name,
+                plate: session.plate,
+                location: session.location,
+                serviceType: session.serviceType,
+                phone: session.phone,
+                statusFinanceiro: session.statusFinanceiro
+            }
         };
     }
 
@@ -122,7 +196,14 @@ export function handleTriageMessage(sessionId: string, message: string): TriageR
             return {
                 reply: "Por favor, escolha: Guincho / Pane elétrica / Pneu / Chaveiro / Mecânico. 🔧",
                 step: session.step,
-                data: { name: session.name, plate: session.plate, location: session.location, serviceType: session.serviceType }
+                data: {
+                    name: session.name,
+                    plate: session.plate,
+                    location: session.location,
+                    serviceType: session.serviceType,
+                    phone: session.phone,
+                    statusFinanceiro: session.statusFinanceiro
+                }
             };
         }
         session.serviceType = resolved;
@@ -130,37 +211,74 @@ export function handleTriageMessage(sessionId: string, message: string): TriageR
         return {
             reply: "Para teste do sistema: responda 1 para ADIMPLENTE ✅ ou 2 para INADIMPLENTE ❌.",
             step: session.step,
-            data: { name: session.name, plate: session.plate, location: session.location, serviceType: session.serviceType }
+            data: {
+                name: session.name,
+                plate: session.plate,
+                location: session.location,
+                serviceType: session.serviceType,
+                phone: session.phone,
+                statusFinanceiro: session.statusFinanceiro
+            }
         };
     }
 
     if (session.step === "ASK_FINANCIAL") {
         if (text === "1") {
-            session.step = "DONE";
+            session.step = "READY_TO_OPEN_OS";
+            session.statusFinanceiro = "ADIMPLENTE";
             return {
                 reply: `Perfeito! Vou abrir a OS e em instantes envio o protocolo. ${formatConfirmation(session)}\n[STATUS_FINANCEIRO=ADIMPLENTE]`,
                 step: session.step,
-                data: { name: session.name, plate: session.plate, location: session.location, serviceType: session.serviceType }
+                data: {
+                    name: session.name,
+                    plate: session.plate,
+                    location: session.location,
+                    serviceType: session.serviceType,
+                    phone: session.phone,
+                    statusFinanceiro: session.statusFinanceiro
+                }
             };
         }
         if (text === "2") {
             session.step = "DONE";
+            session.statusFinanceiro = "INADIMPLENTE";
             return {
                 reply: `Existe uma pendência e a OS não pode ser aberta agora. Quer falar com um atendente? ${formatConfirmation(session)}\n[STATUS_FINANCEIRO=INADIMPLENTE]`,
                 step: session.step,
-                data: { name: session.name, plate: session.plate, location: session.location, serviceType: session.serviceType }
+                data: {
+                    name: session.name,
+                    plate: session.plate,
+                    location: session.location,
+                    serviceType: session.serviceType,
+                    phone: session.phone,
+                    statusFinanceiro: session.statusFinanceiro
+                }
             };
         }
         return {
             reply: "Para teste do sistema: responda 1 para ADIMPLENTE ✅ ou 2 para INADIMPLENTE ❌.",
             step: session.step,
-            data: { name: session.name, plate: session.plate, location: session.location, serviceType: session.serviceType }
+            data: {
+                name: session.name,
+                plate: session.plate,
+                location: session.location,
+                serviceType: session.serviceType,
+                phone: session.phone,
+                statusFinanceiro: session.statusFinanceiro
+            }
         };
     }
 
     return {
         reply: "Posso ajudar em algo mais? 🙂",
         step: session.step,
-        data: { name: session.name, plate: session.plate, location: session.location, serviceType: session.serviceType }
+        data: {
+            name: session.name,
+            plate: session.plate,
+            location: session.location,
+            serviceType: session.serviceType,
+            phone: session.phone,
+            statusFinanceiro: session.statusFinanceiro
+        }
     };
 }

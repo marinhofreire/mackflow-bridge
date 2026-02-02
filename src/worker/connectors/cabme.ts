@@ -145,22 +145,27 @@ export async function cabmeCreateOS(env: WorkerEnv, payload: CabmeCreateOSPayloa
     const defaults = resolveDefaults(config);
     const body = buildRideBookPayload(payload, defaults);
 
-    const response = await fetchWithTimeout(
-        url,
-        {
-            method: "POST",
-            headers: {
-                apikey: config.cabme.apikey,
-                accesstoken: config.cabme.accesstoken,
-                "Content-Type": "application/json"
+    let response: Response;
+    try {
+        response = await fetchWithTimeout(
+            url,
+            {
+                method: "POST",
+                headers: {
+                    apikey: config.cabme.apikey,
+                    accesstoken: config.cabme.accesstoken,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
             },
-            body: JSON.stringify(body)
-        },
-        config.timeoutMs
-    ).catch(() => null);
-
-    if (!response) {
-        return { ok: false, status: null };
+            config.timeoutMs
+        );
+    } catch (error) {
+        return {
+            ok: false,
+            status: null,
+            errorBody: error instanceof Error ? error.message : "fetch_error"
+        };
     }
     const rawText = await response.text().catch(() => "");
     const data = rawText

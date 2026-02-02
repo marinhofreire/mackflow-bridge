@@ -172,7 +172,15 @@ export async function zproIncomingHandler(
                 if (!fallbackResponse || !fallbackResponse.ok) {
                     return c.json({ error: "zpro_send_failed", requestId }, 502);
                 }
-                return c.json({ error: "cabme_create_failed", requestId }, 502);
+                return c.json(
+                    {
+                        error: "cabme_create_failed",
+                        requestId,
+                        status: cabmeResult.status ?? null,
+                        detail: cabmeResult.errorBody ?? null
+                    },
+                    502
+                );
             }
 
             await dedup.put(

@@ -38,6 +38,7 @@ export type CabmeCreateOSResult = {
     status: number | null;
     protocol?: string;
     osId?: string;
+    errorBody?: string;
 };
 
 function ensureTrailingSlash(value: string) {
@@ -161,8 +162,16 @@ export async function cabmeCreateOS(env: WorkerEnv, payload: CabmeCreateOSPayloa
     if (!response) {
         return { ok: false, status: null };
     }
-
-    const data = await response.json().catch(() => null);
+    const rawText = await response.text().catch(() => "");
+    const data = rawText
+        ? (() => {
+            try {
+                return JSON.parse(rawText) as unknown;
+            } catch {
+                return null;
+            }
+        })()
+        : null;
     const protocol = pickProtocol(data ?? undefined) ?? undefined;
     const osId =
         typeof (data as { osId?: unknown } | null)?.osId === "string"
@@ -173,6 +182,7 @@ export async function cabmeCreateOS(env: WorkerEnv, payload: CabmeCreateOSPayloa
         ok: response.ok,
         status: response.status,
         protocol,
-        osId
+        osId,
+        errorBody: response.ok ? undefined : rawText
     };
 }

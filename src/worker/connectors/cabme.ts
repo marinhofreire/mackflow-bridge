@@ -11,16 +11,40 @@ async function fetchWithTimeout(input: RequestInfo, init: RequestInit, timeoutMs
     }
 }
 
+const CABME_API_PREFIX = "v1/";
+
+function ensureTrailingSlash(value: string) {
+    return value.endsWith("/") ? value : `${value}/`;
+}
+
+function normalizePath(path: string) {
+    const trimmed = path.trim().replace(/^\//, "");
+    return trimmed.endsWith("/") ? trimmed : `${trimmed}/`;
+}
+
+function buildCabmeUrl(baseUrl: string, path: string) {
+    if (/^https?:\/\//i.test(path)) {
+        return path;
+    }
+    const normalizedBase = ensureTrailingSlash(baseUrl);
+    const normalizedPath = normalizePath(path);
+    return new URL(normalizedPath, normalizedBase).toString();
+}
+
+function getCabmeHeaders(config: ReturnType<typeof getConfig>) {
+    return {
+        apikey: config.cabme.apikey,
+        accesstoken: config.cabme.accesstoken,
+        "Content-Type": "application/json"
+    };
+}
+
 export async function getVehicleCategories(env: WorkerEnv) {
     const config = getConfig(env);
+    const url = buildCabmeUrl(config.cabme.baseUrl, `${CABME_API_PREFIX}Vehicle-category/`);
     return fetchWithTimeout(
-        `${config.cabme.baseUrl}Vehicle-category/`,
-        {
-            headers: {
-                apikey: config.cabme.apikey,
-                accesstoken: config.cabme.accesstoken
-            }
-        },
+        url,
+        { headers: getCabmeHeaders(config) },
         config.timeoutMs
     );
 }
@@ -41,17 +65,8 @@ export type CabmeCreateOSResult = {
     errorBody?: string;
 };
 
-function ensureTrailingSlash(value: string) {
-    return value.endsWith("/") ? value : `${value}/`;
-}
-
 function hasV1Segment(value: string) {
     return value.includes("/v1/") || value.includes("/api/v1/");
-}
-
-function normalizePath(path: string) {
-    const trimmed = path.trim().replace(/^\//, "");
-    return trimmed.endsWith("/") ? trimmed : `${trimmed}/`;
 }
 
 function resolveCreateOsUrl(baseUrl: string, path?: string) {
@@ -151,11 +166,7 @@ export async function cabmeCreateOS(env: WorkerEnv, payload: CabmeCreateOSPayloa
             url,
             {
                 method: "POST",
-                headers: {
-                    apikey: config.cabme.apikey,
-                    accesstoken: config.cabme.accesstoken,
-                    "Content-Type": "application/json"
-                },
+                headers: getCabmeHeaders(config),
                 body: JSON.stringify(body)
             },
             config.timeoutMs

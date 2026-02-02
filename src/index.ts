@@ -3,6 +3,7 @@ import { healthHandler } from "./worker/routes/health";
 import { adminSmokeHandler } from "./worker/routes/admin";
 import { triageHandler } from "./worker/routes/triage";
 import { zproIncomingHandler } from "./worker/routes/zpro";
+import { cabmePingHandler } from "./worker/routes/cabme";
 import type { WorkerEnv } from "./worker/config";
 
 const app = new Hono<{ Bindings: WorkerEnv; Variables: { requestId: string } }>();
@@ -37,6 +38,7 @@ app.get("/favicon.ico", (c) => c.body(null, 204));
 app.get("/admin/smoke", (c) => adminSmokeHandler(c));
 app.post("/triage", (c) => triageHandler(c));
 app.post("/zpro/incoming", (c) => zproIncomingHandler(c));
+app.get("/cabme/ping", (c) => cabmePingHandler(c));
 
 app.onError((err, c) => {
     const requestId = c.get("requestId");

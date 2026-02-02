@@ -183,6 +183,7 @@ export async function zproIncomingHandler(
                                 error: "CF_1003",
                                 message: "403 (Cloudflare 1003): o Cloudflare está bloqueando a chamada do Worker ao CabMe. Verifique se CABME_BASE_URL está usando domínio (https://console.mackflow.com.br/api/) e não IP, e se não há regra/WAF bloqueando Workers.",
                                 next: "Confirme CABME_BASE_URL e libere o Worker nas regras do Cloudflare (WAF/Bot/Firewall), depois rode /cabme/ping de novo.",
+                                baseUsed: c.env.CABME_ORIGIN_BASE_URL || c.env.CABME_BASE_URL,
                                 status: cabmeResult.status,
                                 debugSnippet,
                                 requestId
@@ -197,6 +198,7 @@ export async function zproIncomingHandler(
                             error: "CABME_AUTH",
                             message: "403: CabMe recusou autenticação. Isso normalmente indica CABME_ACCESSTOKEN inválido/inativo na tabela (access_tokens/users_access).",
                             next: "Atualize o secret CABME_ACCESSTOKEN com um token ativo do CabMe e teste /cabme/ping.",
+                            baseUsed: c.env.CABME_ORIGIN_BASE_URL || c.env.CABME_BASE_URL,
                             status: cabmeResult.status,
                             debugSnippet,
                             requestId

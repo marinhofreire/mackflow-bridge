@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export type WorkerEnv = {
     CABME_BASE_URL: string;
+    CABME_ORIGIN_BASE_URL?: string;
     CABME_APIKEY: string;
     CABME_ACCESSTOKEN: string;
     CABME_CREATE_OS_PATH?: string;
@@ -28,6 +29,7 @@ export type WorkerEnv = {
 
 const envSchema = z.object({
     CABME_BASE_URL: z.string().min(1),
+    CABME_ORIGIN_BASE_URL: z.string().optional(),
     CABME_APIKEY: z.string().min(1),
     CABME_ACCESSTOKEN: z.string().min(1),
     CABME_CREATE_OS_PATH: z.string().optional(),

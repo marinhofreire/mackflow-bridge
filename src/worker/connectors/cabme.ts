@@ -31,6 +31,10 @@ function buildCabmeUrl(baseUrl: string, path: string) {
     return new URL(normalizedPath, normalizedBase).toString();
 }
 
+function resolveCabmeBase(env: WorkerEnv, config: ReturnType<typeof getConfig>) {
+    return env.CABME_ORIGIN_BASE_URL || config.cabme.baseUrl;
+}
+
 function getCabmeHeaders(config: ReturnType<typeof getConfig>) {
     return {
         apikey: config.cabme.apikey,
@@ -41,10 +45,11 @@ function getCabmeHeaders(config: ReturnType<typeof getConfig>) {
 
 export async function getVehicleCategories(env: WorkerEnv) {
     const config = getConfig(env);
-    const url = buildCabmeUrl(config.cabme.baseUrl, `${CABME_API_PREFIX}Vehicle-category/`);
+    const baseUsed = resolveCabmeBase(env, config);
+    const url = buildCabmeUrl(baseUsed, `${CABME_API_PREFIX}Vehicle-category/`);
     return fetchWithTimeout(
         url,
-        { headers: getCabmeHeaders(config) },
+        { headers: getCabmeHeaders(config), redirect: "manual" },
         config.timeoutMs
     );
 }
@@ -156,7 +161,8 @@ function buildRideBookPayload(
 
 export async function cabmeCreateOS(env: WorkerEnv, payload: CabmeCreateOSPayload): Promise<CabmeCreateOSResult> {
     const config = getConfig(env);
-    const url = resolveCreateOsUrl(config.cabme.baseUrl, config.cabme.createOsPath ?? env.CABME_CREATE_OS_PATH);
+    const baseUsed = resolveCabmeBase(env, config);
+    const url = resolveCreateOsUrl(baseUsed, config.cabme.createOsPath ?? env.CABME_CREATE_OS_PATH);
     const defaults = resolveDefaults(config);
     const body = buildRideBookPayload(payload, defaults);
 
@@ -167,6 +173,7 @@ export async function cabmeCreateOS(env: WorkerEnv, payload: CabmeCreateOSPayloa
             {
                 method: "POST",
                 headers: getCabmeHeaders(config),
+                redirect: "manual",
                 body: JSON.stringify(body)
             },
             config.timeoutMs

@@ -59,7 +59,7 @@ export function getConfig(env: WorkerEnv) {
         cabme: {
             baseUrl: parsed.CABME_BASE_URL,
             apikey: parsed.CABME_APIKEY,
-            accesstoken: parsed.CABME_ACCESSTOKEN
+            accesstoken: parsed.CABME_ACCESSTOKEN,
             createOsPath: parsed.CABME_CREATE_OS_PATH,
             defaults: {
                 userId: parsed.CABME_DEFAULT_USER_ID,

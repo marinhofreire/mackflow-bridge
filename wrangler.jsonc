@@ -4,13 +4,26 @@
     "main": "src/index.ts",
     "vars": {
         "ZPRO_BASE_URL": "https://api.soucall.com.br",
-        "ZPRO_API_ID": "cf3aaa7b-236c-4267-be5a-5a62b0882264"
+        "ZPRO_API_ID": "cf3aaa7b-236c-4267-be5a-5a62b0882264",
+        "CABME_BASE_URL": "https://console.mackflow.com.br/api/",
+        "CABME_CREATE_OS_PATH": "v1/ride-book/",
+        "CABME_DEFAULT_USER_ID": "1",
+        "CABME_DEFAULT_LAT": "-23.5505",
+        "CABME_DEFAULT_LNG": "-46.6333",
+        "CABME_DEFAULT_DEST_LAT": "-23.5596",
+        "CABME_DEFAULT_DEST_LNG": "-46.6583",
+        "CABME_DEFAULT_DEST_NAME": "Destino",
+        "CABME_DEFAULT_TOTAL_PEOPLE": "1",
+        "CABME_DEFAULT_TOTAL_CHILDREN": "0",
+        "CABME_DEFAULT_SUB_TOTAL": "0",
+        "CABME_DEFAULT_DISTANCE": "1.2",
+        "CABME_DEFAULT_DURATION": "10",
+        "CABME_DEFAULT_VEHICLE_TYPE_ID": "1"
     },
     "kv_namespaces": [
         {
             "binding": "EVENT_DEDUP",
-            "id": "REPLACE_WITH_EVENT_DEDUP_ID",
-            "preview_id": "REPLACE_WITH_EVENT_DEDUP_PREVIEW_ID"
+            "id": "3ce09cc314cd4791936f457016fff083"
         }
     ],
     "routes": [

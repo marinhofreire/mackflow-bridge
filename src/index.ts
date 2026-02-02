@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 import { healthHandler } from "./worker/routes/health";
 import { adminSmokeHandler } from "./worker/routes/admin";
+import { triageHandler } from "./worker/routes/triage";
+import { zproIncomingHandler } from "./worker/routes/zpro";
 import type { WorkerEnv } from "./worker/config";
 
 const app = new Hono<{ Bindings: WorkerEnv; Variables: { requestId: string } }>();
@@ -31,7 +33,10 @@ app.use("*", async (c, next) => {
 
 app.get("/health", (c) => healthHandler(c));
 app.get("/", (c) => c.json({ ok: true, service: "mackflow-bridge" }));
+app.get("/favicon.ico", (c) => c.body(null, 204));
 app.get("/admin/smoke", (c) => adminSmokeHandler(c));
+app.post("/triage", (c) => triageHandler(c));
+app.post("/zpro/incoming", (c) => zproIncomingHandler(c));
 
 app.onError((err, c) => {
     const requestId = c.get("requestId");

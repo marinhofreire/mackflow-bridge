@@ -6,3 +6,4 @@ ZPRO_API_ID=cf3aaa7b-236c-4267-be5a-5a62b0882264
 ZPRO_TOKEN=your_zpro_token
 REQUEST_TIMEOUT_MS=15000
 LOG_LEVEL=info
+ADMIN_KEY=your_admin_key

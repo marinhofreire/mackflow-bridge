@@ -1,5 +1,16 @@
 {
     "name": "mackflow-bridge",
     "compatibility_date": "2026-02-01",
-    "main": "src/index.ts"
+    "main": "src/index.ts",
+    "vars": {
+        "ZPRO_BASE_URL": "https://api.soucall.com.br",
+        "ZPRO_API_ID": "cf3aaa7b-236c-4267-be5a-5a62b0882264"
+    },
+    "routes": [
+        {
+            "pattern": "bridge.mackflow.com.br",
+            "zone_name": "mackflow.com.br",
+            "custom_domain": true
+        }
+    ]
 }

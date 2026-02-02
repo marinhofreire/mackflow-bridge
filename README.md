@@ -20,3 +20,8 @@ npm run deploy
 ## Endpoints
 - GET /health
 - GET /admin/smoke
+- POST /triage
+- POST /zpro/incoming
+
+## Segurança
+- Para proteger /admin/smoke, configure ADMIN_KEY e envie o header x-admin-key.

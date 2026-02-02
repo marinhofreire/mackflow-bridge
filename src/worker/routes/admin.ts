@@ -21,6 +21,13 @@ async function timedCall(fn: () => Promise<Response>): Promise<CallResult> {
 export async function adminSmokeHandler(
     c: Context<{ Bindings: WorkerEnv; Variables: { requestId: string } }>
 ) {
+    const adminKey = c.env.ADMIN_KEY;
+    if (adminKey && adminKey.length > 0) {
+        const headerKey = c.req.header("x-admin-key");
+        if (!headerKey || headerKey !== adminKey) {
+            return c.json({ error: "unauthorized", requestId: c.get("requestId") }, 401);
+        }
+    }
     const env = c.env;
     const [cabme, zpro] = await Promise.all([
         timedCall(() => getVehicleCategories(env)),

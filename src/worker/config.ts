@@ -7,6 +7,7 @@ export type WorkerEnv = {
     ZPRO_BASE_URL: string;
     ZPRO_API_ID: string;
     ZPRO_TOKEN: string;
+    ADMIN_KEY?: string;
     REQUEST_TIMEOUT_MS?: string;
     LOG_LEVEL?: string;
 };
@@ -18,6 +19,7 @@ const envSchema = z.object({
     ZPRO_BASE_URL: z.string().min(1),
     ZPRO_API_ID: z.string().min(1),
     ZPRO_TOKEN: z.string().min(1),
+    ADMIN_KEY: z.string().optional(),
     REQUEST_TIMEOUT_MS: z.string().optional(),
     LOG_LEVEL: z.string().optional()
 });

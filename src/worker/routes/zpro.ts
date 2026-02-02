@@ -141,52 +141,64 @@ export async function zproIncomingHandler(
     }
 
     if (triage.step === "READY_TO_OPEN_OS" && triage.data.statusFinanceiro === "ADIMPLENTE") {
-        const dedup = c.env.EVENT_DEDUP;
-        if (!dedup) {
-            return c.json({ error: "dedup_missing", requestId }, 500);
-        }
+        try {
+            const dedup = c.env.EVENT_DEDUP;
+            if (!dedup) {
+                return c.json({ error: "dedup_missing", requestId }, 500);
+            }
 
-        const cached = await dedup.get<DedupStored>(externalKey, "json");
-        const cachedProtocol = cached?.protocol ?? cached?.osId ?? null;
-        if (cachedProtocol) {
-            const cachedMessage = formatSuccessMessage(cachedProtocol, triage.data);
-            const cachedResponse = await sendZproMessage(config, extracted.number, cachedMessage, externalKey);
-            if (!cachedResponse || !cachedResponse.ok) {
+            const cached = await dedup.get<DedupStored>(externalKey, "json");
+            const cachedProtocol = cached?.protocol ?? cached?.osId ?? null;
+            if (cachedProtocol) {
+                const cachedMessage = formatSuccessMessage(cachedProtocol, triage.data);
+                const cachedResponse = await sendZproMessage(config, extracted.number, cachedMessage, externalKey);
+                if (!cachedResponse || !cachedResponse.ok) {
+                    return c.json({ error: "zpro_send_failed", requestId }, 502);
+                }
+                return c.json({ ok: true, step: triage.step, requestId, protocol: cachedProtocol, dedup: true });
+            }
+
+            const cabmeResult = await cabmeCreateOS(c.env, {
+                name: triage.data.name ?? "",
+                plate: triage.data.plate ?? "",
+                location: triage.data.location ?? "",
+                serviceType: triage.data.serviceType ?? "",
+                phone: triage.data.phone ?? extracted.number
+            });
+
+            if (!cabmeResult.ok || !cabmeResult.protocol) {
+                const fallbackMessage = "⚠️ Não consegui abrir a OS agora. Vou te direcionar para um atendente.";
+                const fallbackResponse = await sendZproMessage(config, extracted.number, fallbackMessage, externalKey);
+                if (!fallbackResponse || !fallbackResponse.ok) {
+                    return c.json({ error: "zpro_send_failed", requestId }, 502);
+                }
+                return c.json({ error: "cabme_create_failed", requestId }, 502);
+            }
+
+            await dedup.put(
+                externalKey,
+                JSON.stringify({ protocol: cabmeResult.protocol, osId: cabmeResult.osId }),
+                { expirationTtl: 86400 }
+            );
+
+            const successMessage = formatSuccessMessage(cabmeResult.protocol, triage.data);
+            const successResponse = await sendZproMessage(config, extracted.number, successMessage, externalKey);
+            if (!successResponse || !successResponse.ok) {
                 return c.json({ error: "zpro_send_failed", requestId }, 502);
             }
-            return c.json({ ok: true, step: triage.step, requestId, protocol: cachedProtocol, dedup: true });
+
+            return c.json({ ok: true, step: triage.step, requestId, protocol: cabmeResult.protocol });
+        } catch (error) {
+            console.log(
+                JSON.stringify({
+                    level: "error",
+                    msg: "cabme_flow_error",
+                    requestId,
+                    error: error instanceof Error ? error.message : "unknown_error"
+                })
+            );
+            return c.json({ error: "cabme_flow_error", requestId }, 502);
         }
-
-        const cabmeResult = await cabmeCreateOS(c.env, {
-            name: triage.data.name ?? "",
-            plate: triage.data.plate ?? "",
-            location: triage.data.location ?? "",
-            serviceType: triage.data.serviceType ?? "",
-            phone: triage.data.phone ?? extracted.number
-        });
-
-        if (!cabmeResult.ok || !cabmeResult.protocol) {
-            const fallbackMessage = "⚠️ Não consegui abrir a OS agora. Vou te direcionar para um atendente.";
-            const fallbackResponse = await sendZproMessage(config, extracted.number, fallbackMessage, externalKey);
-            if (!fallbackResponse || !fallbackResponse.ok) {
-                return c.json({ error: "zpro_send_failed", requestId }, 502);
-            }
-            return c.json({ error: "cabme_create_failed", requestId }, 502);
-        }
-
-        await dedup.put(
-            externalKey,
-            JSON.stringify({ protocol: cabmeResult.protocol, osId: cabmeResult.osId }),
-            { expirationTtl: 86400 }
-        );
-
-        const successMessage = formatSuccessMessage(cabmeResult.protocol, triage.data);
-        const successResponse = await sendZproMessage(config, extracted.number, successMessage, externalKey);
-        if (!successResponse || !successResponse.ok) {
-            return c.json({ error: "zpro_send_failed", requestId }, 502);
-        }
-
-        return c.json({ ok: true, step: triage.step, requestId, protocol: cabmeResult.protocol });
     }
 
     if (triage.data.statusFinanceiro === "INADIMPLENTE") {

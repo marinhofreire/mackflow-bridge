@@ -5,7 +5,7 @@
     "vars": {
         "ZPRO_BASE_URL": "https://api.soucall.com.br",
         "ZPRO_API_ID": "cf3aaa7b-236c-4267-be5a-5a62b0882264",
-        "CABME_BASE_URL": "https://console.mackflow.com.br/api/",
+        "CABME_BASE_URL": "http://157.230.132.6/api/",
         "CABME_CREATE_OS_PATH": "v1/ride-book/",
         "CABME_DEFAULT_USER_ID": "1",
         "CABME_DEFAULT_LAT": "-23.5505",

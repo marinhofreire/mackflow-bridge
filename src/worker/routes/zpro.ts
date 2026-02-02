@@ -189,15 +189,16 @@ export async function zproIncomingHandler(
 
             return c.json({ ok: true, step: triage.step, requestId, protocol: cabmeResult.protocol });
         } catch (error) {
+            const detail = error instanceof Error ? error.message : "unknown_error";
             console.log(
                 JSON.stringify({
                     level: "error",
                     msg: "cabme_flow_error",
                     requestId,
-                    error: error instanceof Error ? error.message : "unknown_error"
+                    error: detail
                 })
             );
-            return c.json({ error: "cabme_flow_error", requestId }, 502);
+            return c.json({ error: "cabme_flow_error", detail, requestId }, 502);
         }
     }
 

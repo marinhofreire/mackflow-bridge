@@ -1,3 +1,13 @@
 name = "mackflow-bridge"
-main = "src/index.ts"
-compatibility_date = "2024-01-01"
+main = "src/index.js"
+compatibility_date = "2026-04-20"
+
+[[kv_namespaces]]
+binding = "CLIENTS_KV"
+id = "3ce09cc314cd4791936f457016fff083"
+
+[vars]
+ADMIN_SECRET_PASSWORD = "troque_essa_senha_em_producao"
+CABME_BASE_URL = "https://console.mackflow.com.br/api/"
+CABME_CREATE_OS_PATH = "v1/ride-book/"
+ZPRO_SEND_URL = "https://api.soucall.com.br/send-message"
